@@ -127,6 +127,8 @@ yarn build
 
 В "Веб-лареке" определены ключевые интерфейсы, отражающие структуру данных приложения, что облегчает разработку и поддержку кода.
 
+## Интерфейсы для управления пользовательским интерфейсом и модальными окнами:
+
 ## `IAppState`
 
 Описывает общее состояние приложения, включая каталог товаров, корзину пользователя и текущий заказ.
@@ -137,10 +139,24 @@ yarn build
   - `order: IOrder | null` — информация о текущем заказе или `null`, если заказ отсутствует.
 
 - **Методы:**
-  - `setCatalog(items: IProduct[]): void` — обновляет каталог товаров.
+  - `updateCatalog(catalog: IProduct[]): void` — обновляет каталог товаров.
   - `addToBasket(product: IProduct): void` — добавляет товар в корзину.
   - `removeFromBasket(product: IProduct): void` — удаляет товар из корзины.
+  - `createOrder(order: IOrder): void` - Метод для создания нового заказа. Принимает объект заказа.
   - `getTotalBasketPrice(): number` — вычисляет общую стоимость товаров в корзине.
+
+```typescript
+interface IAppState {
+  catalog: IProduct[];
+  basket: IProduct[];
+  order: IOrder | null;
+  updateCatalog(catalog: IProduct[]): void;
+  addToBasket(product: IProduct): void;
+  removeFromBasket(productId: string): void;
+  createOrder(order: IOrder): void;
+  getTotalBasketPrice(): number;
+}
+```
 
 ## `IModal`
 
@@ -149,18 +165,38 @@ yarn build
 - **Свойства:**
   - `content: HTMLElement` — содержимое модального окна.
 
+```typescript
+interface IModal {
+  content: HTMLElement;
+  open(): void;
+  close(): void;
+}
+```
+
 ## `IProduct`
 
 Определяет структуру данных товара в каталоге.
 
 - **Свойства:**
   - `id: string` — уникальный идентификатор товара.
-  - `image: string` — URL изображения товара.
   - `title: string` — название товара.
+  - `description: string` — описание товара.
   - `category: string` — категория товара.
   - `price: number | null` — цена товара.
-  - `description: string` — описание товара.
+  - `image: string` — URL изображения товара.
   - `selected: boolean` — статус выбранности товара.
+
+```typescript
+interface IProduct {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  image: string;
+  selected: boolean;
+}
+```
 
 ## `IPage`
 
@@ -171,6 +207,14 @@ yarn build
   - `catalog: HTMLElement[]` — карточки товаров.
   - `locked: boolean` — статус блокировки прокрутки страницы.
 
+```typescript
+interface IPage {
+  counter: number;
+  catalog: IProduct[];
+  locked: boolean;
+}
+```
+
 ## `IBasket`
 
 Описывает структуру корзины покупок.
@@ -178,6 +222,13 @@ yarn build
 - **Свойства:**
   - `list: HTMLElement[]` — список товаров в корзине.
   - `total: number` — общая стоимость товаров.
+
+```typescript
+interface IBasket {
+  items: IProduct[];
+  total: number;
+}
+```
 
 ## `IProductInBasket extends IProduct`
 
@@ -198,6 +249,19 @@ yarn build
   - `email: string` — email покупателя.
   - `phone: string` — телефон покупателя.
 
+```typescript
+interface IOrder {
+  items: string[];
+  payment: string;
+  total: number;
+  address: string;
+  email: string;
+  phone: string;
+}
+```
+
+## Интерфейсы форм:
+
 ## `IContactsForm`
 
 Интерфейс формы контактных данных.
@@ -213,6 +277,15 @@ yarn build
 - **Свойства:**
   - `address: string` — адрес.
   - `payment: string` — способ оплаты.
+
+## `ISuccessForm`
+
+Интерфейс формы успешного оформления заказа.
+
+- **Свойства:**
+  - `description: number` — сумма списанных средств.
+
+## Валидация и результаты заказа:
 
 ## `IOrderResult`
 
@@ -231,13 +304,6 @@ yarn build
   - `email: string` — email.
   - `address: string` — адрес.
   - `payment: string` — способ оплаты.
-
-## `ISuccessForm`
-
-Интерфейс формы успешного оформления заказа.
-
-- **Свойства:**
-  - `description: number` — сумма списанных средств.
 
 # Model (Модель)
 Компоненты модели данных
