@@ -14,6 +14,8 @@ const isProduction = process.env.NODE_ENV == "production";
 
 const stylesHandler = MiniCssExtractPlugin.loader;
 
+const CopyPlugin = require("copy-webpack-plugin");
+
 const config = {
   entry: "./src/index.ts",
   devtool: "source-map",
@@ -26,6 +28,7 @@ const config = {
     watchFiles: ["src/pages/*.html"],
     hot: true
   },
+  
   plugins: [
     new HtmlWebpackPlugin({
       template: "src/pages/index.html"
@@ -35,6 +38,13 @@ const config = {
 
     // Add your plugins here
     // Learn more about plugins from https://webpack.js.org/configuration/plugins/
+
+    new CopyPlugin({
+      patterns: [
+        { from: path.resolve(__dirname, "src/public"), to: "" }, // Копирует все из public в dist
+      ],
+    }),
+
     new DefinePlugin({
       'process.env.DEVELOPMENT': !isProduction,
       'process.env.API_ORIGIN': JSON.stringify(process.env.API_ORIGIN ?? '')
