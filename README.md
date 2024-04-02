@@ -31,7 +31,7 @@
 
 │       |-- `index.ts` — точка входа приложения
 
-│       |-- `styles/`
+│       |-- `scss/`
 │           |--- `styles.scss` — корневой файл стилей
 
 │       |-- `utils/`
@@ -86,18 +86,6 @@ yarn build
   - `post(uri: string, data: object, method: ApiPostMethods = 'POST'): Promise<object>` — Выполняет POST-запрос.
   - `handleResponse(response: Response): Promise<object>` — Обрабатывает ответ сервера.
 
-- **Типы ответов:**
-  ```typescript
-  type ApiListResponse<Type> = {
-      total: number,
-      items: Type[]
-  };
-
-  type ApiOrderResponse<Type> = {
-      total: number,
-      id: string
-  }
-
 ## `class EventEmitter`
 
 Класс `EventEmitter` реализует паттерн "Наблюдатель", позволяя компонентам подписываться на события и реагировать на их выполнение.
@@ -113,8 +101,8 @@ yarn build
   - `emit` - Метод для инициирования события в `EventEmitter`. 
   - `trigger` - Метод создает коллбек-триггер, который при вызове инициирует событие. 
 
-## `class Component`
-Класс `Component` является основой для всех компонентов UI проекта, обеспечивая методы для работы с DOM.
+## `abstract class Component`
+базовый абстрактный класс `Component` является основой для всех компонентов UI проекта, обеспечивая методы для работы с DOM.
 
 - **Конструктор:** 
   - Принимает DOM-элемент, служащий контейнером компонента.
@@ -139,7 +127,7 @@ yarn build
   - `order: IOrder | null` — информация о текущем заказе или `null`, если заказ отсутствует.
 
 - **Методы:**
-  - `updateCatalog(catalog: IProduct[]): void` — обновляет каталог товаров.
+  - `setCatalog(catalog: IProduct[]): void` — устанавливаем каталог товаров.
   - `addToBasket(product: IProduct): void` — добавляет товар в корзину.
   - `removeFromBasket(product: IProduct): void` — удаляет товар из корзины.
   - `createOrder(order: IOrder): void` - Метод для создания нового заказа. Принимает объект заказа.
@@ -150,9 +138,9 @@ interface IAppState {
   catalog: IProduct[];
   basket: IProduct[];
   order: IOrder | null;
-  updateCatalog(catalog: IProduct[]): void;
+  setCatalog(catalog: IProduct[]): void;
   addToBasket(product: IProduct): void;
-  removeFromBasket(productId: string): void;
+  removeFromBasket(productId: IProduct): void;
   createOrder(order: IOrder): void;
   getTotalBasketPrice(): number;
 }
@@ -164,6 +152,8 @@ interface IAppState {
 
 - **Свойства:**
   - `content: HTMLElement` — содержимое модального окна.
+  - `open()` - открытие модального окна и отображение его содержимого
+  - `close()` - закрытие модального окна и скрытие его содержимого
 
 ```typescript
 interface IModal {
@@ -179,22 +169,20 @@ interface IModal {
 
 - **Свойства:**
   - `id: string` — уникальный идентификатор товара.
-  - `title: string` — название товара.
   - `description: string` — описание товара.
+  - `image: string` — URL изображения товара.
+  - `title: string` — название товара.
   - `category: string` — категория товара.
   - `price: number | null` — цена товара.
-  - `image: string` — URL изображения товара.
-  - `selected: boolean` — статус выбранности товара.
 
 ```typescript
-interface IProduct {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  price: number;
-  image: string;
-  selected: boolean;
+ interface IProduct {
+	id: string; 
+  description: string
+	image: string;
+	title: string;
+	category: string;
+	price: number | null;
 }
 ```
 
@@ -208,10 +196,10 @@ interface IProduct {
   - `locked: boolean` — статус блокировки прокрутки страницы.
 
 ```typescript
-interface IPage {
-  counter: number;
-  catalog: IProduct[];
-  locked: boolean;
+ interface IPage {
+	counter: number;
+	catalog: HTMLElement[]; 
+	locked: boolean;
 }
 ```
 
@@ -225,8 +213,21 @@ interface IPage {
 
 ```typescript
 interface IBasket {
-  items: IProduct[];
+  list: IProduct[];
   total: number;
+}
+```
+
+## `IProductInBasket extends IProduct`
+
+Описывает товар в списке корзины.
+
+- **Свойства:**
+  - `index` - порядковый номер в корзине
+
+```typescript
+interface IProductInBasket extends IProduct {
+	index: number;
 }
 ```
 
@@ -235,22 +236,19 @@ interface IBasket {
 Описывает структуру заказа.
 
 - **Свойства:**
-  - `items: string[]` — идентификаторы товаров в заказе.
   - `payment: string` — выбранный способ оплаты.
-  - `total: number` — общая сумма заказа.
-  - `address: string` — адрес доставки.
   - `email: string` — email покупателя.
   - `phone: string` — телефон покупателя.
+  - `address: string` — адрес доставки.
+  - `total: number` — общая сумма заказа.
+  - `items: string[]` — идентификаторы товаров в заказе.
 
 ```typescript
-interface IOrder {
-  items: string[];
-  payment: string;
-  total: number;
-  address: string;
-  email: string;
-  phone: string;
+interface IOrder extends IContactsForm, IOrderForm { 
+  items: string[]; 
+  total: number; 
 }
+// круто! спасибо Ольга!
 ```
 
 ## Интерфейсы форм:
@@ -263,6 +261,13 @@ interface IOrder {
   - `phone: string` — телефон.
   - `email: string` — email.
 
+```typescript
+interface IContactsForm {
+	phone: string;
+	email: string;
+}
+```
+
 ## `IOrderForm`
 
 Интерфейс формы оплаты заказа.
@@ -271,12 +276,12 @@ interface IOrder {
   - `address: string` — адрес.
   - `payment: string` — способ оплаты.
 
-## `ISuccessForm`
-
-Интерфейс формы успешного оформления заказа.
-
-- **Свойства:**
-  - `description: number` — сумма списанных средств.
+```typescript
+interface IOrderForm {
+	address: string;
+	payment: string;
+}
+```
 
 ## Валидация и результаты заказа:
 
@@ -288,6 +293,13 @@ interface IOrder {
   - `id: string` — идентификатор заказа.
   - `total: number` — сумма заказа.
 
+```typescript
+interface IOrderResult {
+	id: string;
+	total: number;
+}
+```
+
 ## `IOrderValidate`
 
 Интерфейс для валидации данных заказа.
@@ -298,22 +310,40 @@ interface IOrder {
   - `address: string` — адрес.
   - `payment: string` — способ оплаты.
 
+```typescript
+interface IOrderValidate {
+	phone: string;
+	email: string;
+	address: string;
+	payment: string;
+}
+```
+
 # Архитектура
 ## (MVP)
 
 # Model (Модель)
 Компоненты модели данных
 
+## `abstract class Model`
+Абстрактный класс `Model` служит основой для создания моделей данных. Модели предназначены для хранения, представления и манипуляции данными.
+
+- **Конструктор:**
+  - `constructor(data: Partial<T>, protected events: IEvents)` - инициализирует модель определенными данными и системой управления событиями.
+  - 
+- **Методы:**
+  - `notifyChange()` - уведомляет систему управления событиями о том, что состояние модели изменилось, триггеря соответствующие действия или обработчики событий.
+
 ## `class Product`
 Класс `Product` является расширением базовой модели данных, реализованной через класс `Model`, и включает в себя свойства, определённые в интерфейсе `IProduct`. 
 
   - `id: string;` - Уникальный идентификатор продукта в системе.
-  - `description: string;` - Текстовое описание продукта, предоставляющее детальную информацию о его характеристиках.
   - `image: string;` - Ссылка на изображение продукта, позволяющая визуализировать его в интерфейсе пользователя.
   - `title: string;` - Название продукта, используемое в каталоге и при представлении продукта пользователю.
   - `category: string;` - Категория, к которой относится продукт, помогающая классифицировать продукт по типу.
-  - `status: boolean;` - Статус наличия продукта в корзине пользователя, где `true` означает, что продукт добавлен в корзину.
   - `price: number;` - Цена продукта, указанная в условных единицах.
+  - `description: string;` - Текстовое описание продукта, предоставляющее детальную информацию о его характеристиках.
+  - `selected: boolean;` - Статус наличия продукта в корзине пользователя, где `true` означает, что продукт добавлен в корзину.
 
 ## `class AppState`
 Класс `AppState`, расширяющий базовый класс `Model` и реализующий интерфейс `IAppState`, отвечает за хранение и управление общим состоянием приложения.
@@ -358,7 +388,6 @@ interface IOrder {
   - `set counter(value: number)` - Устанавливает количество товаров на иконке корзины.
   - `set catalog(items: HTMLElement[])` - Отображает каталог товаров.
   - `set locked(value: boolean)` - Блокирует или разблокирует страницу при взаимодействии с модальными окнами.
-
 
 ## `class Card`
 Класс `Card` — компонент для отображения информации о продукте в виде карточки. Он наследуется от `Component` и реализует интерфейс `IProduct`.
@@ -511,4 +540,27 @@ interface IOrder {
   - `set description(value: string)` - Устанавливает текст с описанием заказа, включая его общую стоимость, предоставляя пользователю полезную информацию о совершенной покупке.
 
 # Presenter (Презентер)
-Презентер служит посредником между Моделью и Представлением. 
+Презентер выполняет роль посредника между моделью `Model` и представлением `View`, что позволяет разделить бизнес-логику приложения и пользовательский интерфейс. 
+
+```typescript
+enum AppEvents {
+    ProductSelected = "product:selected", // Выбор продукта для подробного просмотра
+    ProductAddToBasket = "product:addToBasket", // Добавление товара в корзину
+    ProductRemoveFromBasket = "product:removeFromBasket", // Удаление товара из корзины
+    BasketCheckout = "basket:checkout", // Оформление заказа
+    OrderSubmitted = "order:submitted", // Подтверждение и отправка заказа
+    OrderSuccessful = "order:successful", // Успешное оформление заказа
+    ViewUpdated = "view:updated" //  обновление представления.
+
+    // надеюсь я правльно понял и реализовал Enum
+}
+```
+# Дополнительные Утилитарные Классы
+
+## class LarekAPI
+Класс `LarekAPI` расширяет функциональность базового класса `Api`, обеспечивая специализированные методы для взаимодействия с сервером, такие как извлечение данных о продуктах и оформление заказов. 
+
+- **Методы:**
+ - `getProductById(id: string)` - Возвращает детальную информацию о продукте, идентификатор которого соответствует переданному id. 
+ - `getProductList()` - Запрашивает и возвращает список всех продуктов, доступных в каталоге. 
+ - `createOrder()` - Принимает объект, содержащий всю необходимую информацию для оформления заказа, и отправляет его на сервер для создания нового заказа.
