@@ -1,29 +1,24 @@
-export type ApiListResponse<Type> = {
-	total: number;
-	items: Type[];
-};
-
 export interface IAppState {
 	catalog: IProduct[];
 	basket: IProduct[];
 	order: IOrder | null;
-	setCatalog(catalog: IProduct[]): void;
-	addToBasket(product: IProduct): void;
-	removeFromBasket(productId: IProduct): void;
-	createOrder(order: IOrder): void;
-	getTotalBasketPrice(): number;
+	setCatalog(items: IProduct[]): void;
+	getPrice(container: IProduct[], value: string): string;
+	addProduct(item: IProduct, container: IProduct[]): void;
+	clearBasket(container: IProduct[]): void;
+	setOrder(state: IOrder): void;
 }
 
-export interface IModal {
-	content: HTMLElement;
-	open(): void;
-	close(): void;
+export interface ITotalItems<T> {
+	total: number;
+	items: T[];
 }
 
 export interface IProduct {
 	id: string;
+	index?: number;
 	description: string;
-	image: string;
+	image?: string;
 	title: string;
 	category: string;
 	price: number | null;
@@ -35,36 +30,17 @@ export interface IPage {
 	locked: boolean;
 }
 
-export interface IBasket {
-	list: IProduct[];
-	total: number;
-}
-
-export interface IProductInBasket extends IProduct {
-	index: number;
-}
-
-export interface IOrder {
-	payment: string;
-	email: string;
-	phone: string;
-	address: string;
-	total: number;
-	items: string[];
-}
-
-export interface IContactsForm {
-	phone: string;
-	email: string;
-}
-
 export interface IOrderForm {
+	email: string;
+	phone: string;
 	address: string;
 	payment: string;
+	total: number;
+	[key: string]: unknown;
 }
 
-export interface ISuccessForm {
-	description: number;
+export interface IOrder extends IOrderForm {
+	items: string[];
 }
 
 export interface IOrderResult {
@@ -72,11 +48,10 @@ export interface IOrderResult {
 	total: number;
 }
 
-export interface IOrderValidate {
-	phone: string;
-	email: string;
-	address: string;
-	payment: string;
+export interface IPage {
+	counter: number;
+	catalog: HTMLElement[];
+	locked: boolean;
 }
 
-export type FormErrors = Partial<Record<keyof IOrder, string>>;
+export type FormErrors = Partial<Record<keyof IOrderForm, string>>;
