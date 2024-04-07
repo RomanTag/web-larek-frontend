@@ -53,7 +53,7 @@ events.on('items:changed', () => {
 		});
 		return card.render({
 			title: item.title,
-			image: CDN_URL + item.image, // показалось что целый класс ради одной константы создавать не стоит, но не уверен
+			image: CDN_URL + item.image, 
 			description: item.description,
 			price: item.price,
 			category: item.category,
