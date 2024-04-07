@@ -13,17 +13,16 @@ import { Basket } from './components/common/Basket';
 import { OrderForm } from './components/OrderForm';
 import { Success } from './components/common/Success';
 
-// Корзина отображается по проекту, проверил в разных браузерах и на разных устройствах
 
 const events = new EventEmitter();
 const api = new Api(API_URL);
 
-// Основные элементы
+
 const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 const appData = new AppState({}, events);
 
-// Все темплейты
+
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const selectedCardTemplate =
 	ensureElement<HTMLTemplateElement>('#card-preview');
@@ -35,17 +34,17 @@ const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-// Переиспользуемые компоненты
+
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 const address = new OrderForm(cloneTemplate(orderTemplate), events);
 const contacts = new OrderForm(cloneTemplate(contactsTemplate), events);
 
-// Чтобы мониторить все события, для отладки
+
 events.onAll(({ eventName, data }) => {
 	console.log(eventName, data);
 });
 
-// Изменения элементов каталога
+
 events.on('items:changed', () => {
 	page.catalog = appData.catalog.map((item) => {
 		const card = new CatalogItem(cloneTemplate(cardCatalogTemplate), {
@@ -61,7 +60,7 @@ events.on('items:changed', () => {
 	});
 });
 
-// Открытие карточки
+
 events.on('card:select', (item: Product) => {
 	const card = new CatalogItem(cloneTemplate(selectedCardTemplate), {
 		onClick: (event) => {
@@ -83,7 +82,7 @@ events.on('card:select', (item: Product) => {
 	card.checkInBasket(item, basket.selected);
 });
 
-// Отрисовка корзины
+
 events.on('basket:render', () => {
 	modal.render({
 		content: basket.render({
@@ -92,14 +91,13 @@ events.on('basket:render', () => {
 					index: index + 1,
 				});
 			}),
-			price: appData.getPrice(basket.selected, catalogValue), // не вышло реализовать через метод reduce
-		}),
-	});
+			price: appData.getPrice(basket.selected, catalogValue), 
+	})
 });
+})
 
-// Обновление элементов корзины
+
 events.on('basket:change', (item: Product | null) => {
-	// то как я воспринимаю эту работу: https://i.postimg.cc/HxyjBX0m/Untitled-1.jpg
 
 	const cardTemplate = new CatalogItem(cloneTemplate(basketCardTemplate), {
 		onClick: (event) => events.emit('basket:delete', item),
@@ -122,7 +120,6 @@ events.on('basket:change', (item: Product | null) => {
 	});
 });
 
-// Удаление элементов из корзины
 events.on('basket:delete', (item: Product) => {
 	basket.selected = basket.selected.filter((element) => {
 		return element.id !== item.id;
@@ -130,7 +127,6 @@ events.on('basket:delete', (item: Product) => {
 	events.emit('basket:change', null);
 });
 
-// Отрисовка страницы с адресом для заказа
 events.on('address:render', () => {
 	modal.render({
 		content: address.render({
@@ -141,7 +137,7 @@ events.on('address:render', () => {
 	});
 });
 
-// Отрисовка страницы с контактными данными для заказа
+
 events.on('contacts:render', () => {
 	modal.render({
 		content: contacts.render({
@@ -154,7 +150,7 @@ events.on('contacts:render', () => {
 	contacts.order.payment = address.order.payment;
 });
 
-// Формирование данных о заказе на отправку
+
 events.on('data:set', () => {
 	let items: string[] = [];
 	basket.selected.forEach((element) => {
@@ -171,7 +167,7 @@ events.on('data:set', () => {
 	});
 });
 
-// Отрисовка окна об успешном заказе
+
 events.on('order:submit', () => {
 	const success = new Success(cloneTemplate(successTemplate), {
 		onClick: () => {
@@ -188,7 +184,7 @@ events.on('order:submit', () => {
 	});
 });
 
-// Отправка данных о заказе
+
 events.on('order:post', () => {
 	events.emit('data:set');
 
@@ -204,17 +200,17 @@ events.on('order:post', () => {
 		});
 });
 
-// Открытие модального окна
+
 events.on('modal:open', () => {
 	page.locked = true;
 });
 
-// Закрытие модального окна
+
 events.on('modal:close', () => {
 	page.locked = false;
 });
 
-// Получение данных для католога
+
 api
 	.get('/product')
 	.then((data: ITotalItems<IProduct>) => appData.setCatalog(data.items))
