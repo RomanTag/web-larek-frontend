@@ -35,8 +35,8 @@ export class Basket extends Component<IBasket> {
 	}
 
 	/*
-	* Определение состояния кнопки корзины
-	*/
+	 * Определение состояния кнопки корзины
+	 */
 	protected setButtonStatus(price: string) {
 		parseInt(price) === 0
 			? this.setDisabled(this._button, true)
@@ -44,8 +44,8 @@ export class Basket extends Component<IBasket> {
 	}
 
 	/*
-	* Установка элементов корзины и их отображение
-	*/
+	 * Установка элементов корзины и их отображение
+	 */
 	set items(items: HTMLElement[]) {
 		if (items.length) {
 			this._list.replaceChildren(...items);
@@ -59,8 +59,8 @@ export class Basket extends Component<IBasket> {
 	}
 
 	/*
-	* Устновить стоимость товаров в корзине
-	*/
+	 * Устновить стоимость товаров в корзине
+	 */
 	set price(price: string) {
 		this.setText(this._price, price);
 		this.setButtonStatus(price);
@@ -68,9 +68,9 @@ export class Basket extends Component<IBasket> {
 	}
 
 	/*
-	* Получить стоимость товаров в корзине
-	*/
-	
+	 * Получить стоимость товаров в корзине
+	 */
+
 	get price(): string {
 		return this.total;
 	}

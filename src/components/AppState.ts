@@ -39,7 +39,7 @@ export class AppState extends Model<IAppState> {
 	/**
 	 * Вычисляет общую стоимость товаров в контейнере.
 	 */
-	getPrice(container: CatalogItem[], value: string = "руб."): string {
+	getPrice(container: CatalogItem[], value: string): string {
 		let totalAmount = 0;
 
 		for (let i = 0; i < container.length; i++) {
@@ -52,7 +52,7 @@ export class AppState extends Model<IAppState> {
 	/**
 	 * Добавляет продукт в указанный контейнер.
 	 */
-	addProduct(item: CatalogItem, container: CatalogItem[]) {
+	addProduct(item: CatalogItem, container: CatalogItem[]): void {
 		if (item) {
 			container.push(item);
 		}
@@ -61,14 +61,14 @@ export class AppState extends Model<IAppState> {
 	/**
 	 * Очищает указанный контейнер товаров.
 	 */
-	clearBasket(container: CatalogItem[]) {
+	clearBasket(container: CatalogItem[]): void {
 		container.length = 0;
 	}
 
 	/**
 	 * Устанавливает данные текущего заказа.
 	 */
-	setOrder(state: IOrder) {
+	setOrder(state: IOrder): void {
 		this.order = Object.assign(this.order, state);
 	}
 }

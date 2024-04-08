@@ -35,6 +35,21 @@ const basket = new Basket(cloneTemplate(basketTemplate), events);
 const address = new OrderForm(cloneTemplate(orderTemplate), events);
 const contacts = new OrderForm(cloneTemplate(contactsTemplate), events);
 
+api
+	.get('/product')
+	.then((data: ITotalItems<IProduct>) => appState.setCatalog(data.items))
+	.catch((err) => {
+		console.error(err);
+	});
+
+events.on('modal:open', () => {
+	page.locked = true;
+});
+
+events.on('modal:close', () => {
+	page.locked = false;
+});
+
 events.onAll(({ eventName, data }) => {
 	console.log(eventName, data);
 });
@@ -56,7 +71,7 @@ events.on('items:changed', () => {
 
 events.on('card:select', (item: Product) => {
 	const card = new CatalogItem(cloneTemplate(selectedCardTemplate), {
-		onClick: (event) => {
+		onClick: (_event) => {
 			item.price !== null
 				? events.emit('basket:change', item)
 				: events.emit('basket:change');
@@ -80,7 +95,7 @@ events.on('basket:render', () => {
 		content: basket.render({
 			items: basket.selected.map((element, index) => {
 				return element.render({
-					index: index + 1,
+					index: ++index,
 				});
 			}),
 			price: appState.getPrice(basket.selected, catalogValue),
@@ -90,7 +105,7 @@ events.on('basket:render', () => {
 
 events.on('basket:change', (item: Product | null) => {
 	const cardTemplate = new CatalogItem(cloneTemplate(basketCardTemplate), {
-		onClick: (event) => events.emit('basket:delete', item),
+		onClick: (_event) => events.emit('basket:delete', item),
 	});
 
 	if (item !== null) {
@@ -140,7 +155,7 @@ events.on('contacts:render', () => {
 });
 
 events.on('data:set', () => {
-	let items: string[] = [];
+	const items: string[] = [];
 	basket.selected.forEach((element) => {
 		items.push(element.id);
 	});
@@ -185,18 +200,3 @@ events.on('order:post', () => {
 			console.error(result);
 		});
 });
-
-events.on('modal:open', () => {
-	page.locked = true;
-});
-
-events.on('modal:close', () => {
-	page.locked = false;
-});
-
-api
-	.get('/product')
-	.then((data: ITotalItems<IProduct>) => appState.setCatalog(data.items))
-	.catch((err) => {
-		console.error(err);
-	});

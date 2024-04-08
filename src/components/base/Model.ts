@@ -1,7 +1,7 @@
 import { IEvents } from './events';
 
 // проверка на модель
-export const isModel = (obj: unknown): obj is Model<any> => {
+export const isModel = <T>(obj: unknown): obj is Model<T> => {
 	return obj instanceof Model;
 };
 
@@ -10,9 +10,6 @@ export const isModel = (obj: unknown): obj is Model<any> => {
  */
 export abstract class Model<T> {
 	constructor(data: Partial<T>, protected events: IEvents) {
-		// Инициализация модели с переданными данными.
-		// Object.assign позволяет скопировать значения всех собственных перечисляемых свойств
-		// из одного или более исходных объектов в целевой объект (this).
 		Object.assign(this, data);
 	}
 
@@ -20,8 +17,6 @@ export abstract class Model<T> {
 	 * Метод для генерации событий.
 	 */
 	emitChanges(event: string, payload?: object) {
-		// Вызов метода emit системы событий, чтобы уведомить остальную часть приложения
-		// об изменении данных в модели.
 		this.events.emit(event, payload ?? {});
 	}
 }
