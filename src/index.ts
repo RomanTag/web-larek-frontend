@@ -13,15 +13,12 @@ import { Basket } from './components/common/Basket';
 import { OrderForm } from './components/OrderForm';
 import { Success } from './components/common/Success';
 
-
 const events = new EventEmitter();
 const api = new Api(API_URL);
 
-
 const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
-const appData = new AppState({}, events);
-
+const appState = new AppState({}, events);
 
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const selectedCardTemplate =
@@ -34,32 +31,28 @@ const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 const address = new OrderForm(cloneTemplate(orderTemplate), events);
 const contacts = new OrderForm(cloneTemplate(contactsTemplate), events);
-
 
 events.onAll(({ eventName, data }) => {
 	console.log(eventName, data);
 });
 
-
 events.on('items:changed', () => {
-	page.catalog = appData.catalog.map((item) => {
+	page.catalog = appState.catalog.map((item) => {
 		const card = new CatalogItem(cloneTemplate(cardCatalogTemplate), {
 			onClick: () => events.emit('card:select', item),
 		});
 		return card.render({
 			title: item.title,
-			image: CDN_URL + item.image, 
+			image: CDN_URL + item.image,
 			description: item.description,
 			price: item.price,
 			category: item.category,
 		});
 	});
 });
-
 
 events.on('card:select', (item: Product) => {
 	const card = new CatalogItem(cloneTemplate(selectedCardTemplate), {
@@ -82,7 +75,6 @@ events.on('card:select', (item: Product) => {
 	card.checkInBasket(item, basket.selected);
 });
 
-
 events.on('basket:render', () => {
 	modal.render({
 		content: basket.render({
@@ -91,14 +83,12 @@ events.on('basket:render', () => {
 					index: index + 1,
 				});
 			}),
-			price: appData.getPrice(basket.selected, catalogValue), 
-	})
+			price: appState.getPrice(basket.selected, catalogValue),
+		}),
+	});
 });
-})
-
 
 events.on('basket:change', (item: Product | null) => {
-
 	const cardTemplate = new CatalogItem(cloneTemplate(basketCardTemplate), {
 		onClick: (event) => events.emit('basket:delete', item),
 	});
@@ -109,7 +99,7 @@ events.on('basket:change', (item: Product | null) => {
 			title: item.title,
 			price: item.price,
 		});
-		appData.addProduct(cardTemplate, basket.selected);
+		appState.addProduct(cardTemplate, basket.selected);
 		modal.close();
 	} else {
 		events.emit('basket:render');
@@ -137,7 +127,6 @@ events.on('address:render', () => {
 	});
 });
 
-
 events.on('contacts:render', () => {
 	modal.render({
 		content: contacts.render({
@@ -150,14 +139,13 @@ events.on('contacts:render', () => {
 	contacts.order.payment = address.order.payment;
 });
 
-
 events.on('data:set', () => {
 	let items: string[] = [];
 	basket.selected.forEach((element) => {
 		items.push(element.id);
 	});
 
-	appData.setOrder({
+	appState.setOrder({
 		address: address.order.payment,
 		payment: address.order.payment,
 		phone: contacts.order.phone,
@@ -167,11 +155,10 @@ events.on('data:set', () => {
 	});
 });
 
-
 events.on('order:submit', () => {
 	const success = new Success(cloneTemplate(successTemplate), {
 		onClick: () => {
-			appData.clearBasket(basket.selected);
+			appState.clearBasket(basket.selected);
 			events.emit('basket:change', null);
 			modal.close();
 		},
@@ -184,12 +171,11 @@ events.on('order:submit', () => {
 	});
 });
 
-
 events.on('order:post', () => {
 	events.emit('data:set');
 
 	api
-		.post('/order', appData.order)
+		.post('/order', appState.order)
 		.then((data: IOrderResult) => data)
 		.then(() => {
 			events.emit('order:submit');
@@ -200,20 +186,17 @@ events.on('order:post', () => {
 		});
 });
 
-
 events.on('modal:open', () => {
 	page.locked = true;
 });
-
 
 events.on('modal:close', () => {
 	page.locked = false;
 });
 
-
 api
 	.get('/product')
-	.then((data: ITotalItems<IProduct>) => appData.setCatalog(data.items))
+	.then((data: ITotalItems<IProduct>) => appState.setCatalog(data.items))
 	.catch((err) => {
 		console.error(err);
 	});

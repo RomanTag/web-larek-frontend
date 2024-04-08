@@ -1,18 +1,17 @@
 import { ensureElement } from '../../utils/utils';
 import { Component } from '../base/Component';
+import { ISuccess, ISuccessActions } from '../../types';
 
-interface ISuccess {
-	total: string;
-}
-
-interface ISuccessActions {
-	onClick: () => void;
-}
-
+/**
+ * Компонент успешного выполнения операции.
+ */
 export class Success extends Component<ISuccess> {
 	protected _close: HTMLElement;
 	protected _total: HTMLElement;
 
+	/**
+	 * Создает экземпляр компонента Success.
+	 */
 	constructor(container: HTMLElement, actions: ISuccessActions) {
 		super(container);
 
@@ -20,20 +19,22 @@ export class Success extends Component<ISuccess> {
 			'.order-success__close',
 			this.container
 		);
-
 		this._total = ensureElement<HTMLElement>(
 			'.order-success__description',
 			this.container
 		);
 
+		// Использование стрелочной функции для обработчика события
 		if (actions?.onClick) {
-			this._close.addEventListener('click', actions.onClick);
+			this._close.addEventListener('click', () => actions.onClick());
 		}
 	}
 
+	/**
+	 * Устанавливает общую сумму списания.
+	 */
 	set total(value: string) {
-		const resValue = 'Списано ' + value;
-
+		const resValue = `Списано ${value}`;
 		this.setText(this._total, resValue);
 	}
 }

@@ -39,7 +39,7 @@ export class AppState extends Model<IAppState> {
 	/**
 	 * Вычисляет общую стоимость товаров в контейнере.
 	 */
-	getPrice(container: CatalogItem[], value: string): string {
+	getPrice(container: CatalogItem[], value: string = "руб."): string {
 		let totalAmount = 0;
 
 		for (let i = 0; i < container.length; i++) {

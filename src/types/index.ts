@@ -39,6 +39,23 @@ export interface IOrderForm {
 	[key: string]: unknown;
 }
 
+export interface IFormState {
+	valid: boolean;
+	errors: string;
+}
+
+export interface IModal {
+	content: HTMLElement;
+}
+
+export interface ISuccess {
+	total: string;
+}
+
+export interface ISuccessActions {
+	onClick: () => void;
+}
+
 export interface IOrder extends IOrderForm {
 	items: string[];
 }
