@@ -18,10 +18,10 @@ import { ContactsOrder } from './components/ContactsOrder';
 import { OrderForm } from './components/OrderForm';
 import { Success } from './components/common/Success';
 
-// Создаем экземпляр EventEmitter для управления событиями
+// Создаю экземпляр EventEmitter для управления событиями
 const events = new EventEmitter();
 
-// Создаем экземпляр LarekApi для взаимодействия с API
+// Создаю экземпляр LarekApi для взаимодействия с API
 const api = new LarekApi(CDN_URL, API_URL);
 
 // Обработка всех событий для отладки
@@ -29,7 +29,7 @@ events.onAll(({ eventName, data }) => {
 	console.log(eventName, data);
 });
 
-// Загрузка всех шаблонов
+// Загружаю все шаблоны
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
@@ -38,10 +38,10 @@ const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 
-// Создаем модель состояния приложения
+// Создаю модель состояния приложения
 export const appState = new AppStateModel({}, events);
 
-// Создаем экземпляры глобальных компонентов
+// Создаю экземпляры глобальных компонентов
 const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 const basket = new Basket(cloneTemplate(basketTemplate), events);
@@ -206,7 +206,7 @@ events.on('order.address:change', (data: { value: string }) => {
 	appState.checkAddress(data.value);
 });
 
-// Отправка формы заказа
+// Отправляю формы заказа
 events.on('contacts:submit', () => {
 	appState.setOrder();
 	api
@@ -231,7 +231,7 @@ events.on('contacts:submit', () => {
 		});
 });
 
-// Блокировка прокрутки страницы при открытии модального окна
+// Блокирую прокрутки страницы при открытии модального окна
 events.on('modal:open', () => {
 	page.locked = true;
 });
@@ -239,13 +239,13 @@ events.on('modal:open', () => {
 // Отчистка корзины после успешного заказа
 events.on('modal:close', () => {
 	page.locked = false;
-	// Проверяем, был ли только что выполнен заказ
+	// Проверяю, был ли только что выполнен заказ
 	if (appState.order && appState.order.total > 0) {
-		// Если заказ выполнен, очищаем корзину
+		// Если заказ выполнен, очищаю корзину
 		appState.clearBasket();
-		// Сбрасываем состояние заказа
+		// Сбрасываю состояние заказа
 		appState.defaultOrder();
-		// Обновляем интерфейс корзины
+		// Обновляю интерфейс корзины
 		events.emit('itemsBasket:changed');
 	}
 });

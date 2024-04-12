@@ -21,7 +21,7 @@ const categoryClasses: Record<string, string> = {
 };
 
 /**
- * Класс Card для отображения деталей продукта в формате карточки.
+ * Класс Card отображает детали продукта в формате карточки.
  */
 export class Card extends Component<CardData> {
 	protected _title: HTMLElement;
