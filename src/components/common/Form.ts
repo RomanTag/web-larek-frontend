@@ -4,7 +4,7 @@ import { IEvents } from '../base/Events';
 import { IFormState } from '../../types';
 
 /*
- * Установка элементов корзины и их отображение
+ * Класс предназначен для управления формой заказа
  */
 export class Form<T> extends Component<IFormState> {
 	protected _submit: HTMLButtonElement;

@@ -4,7 +4,7 @@ import { IEvents } from './base/Events';
 import { IPageData } from '../types';
 
 /**
- * Класс Page отвечает за управление основными элементами на странице.
+ * Класс `Page` предназначен для управления ключевыми элементами пользовательского интерфейса веб-страницы.
  */
 export class Page extends Component<IPageData> {
 	protected _counter: HTMLElement;
@@ -12,13 +12,9 @@ export class Page extends Component<IPageData> {
 	protected _wrapper: HTMLElement;
 	protected _basket: HTMLElement;
 
-	/**
-	 * Создает экземпляр класса Page.
-	 */
 	constructor(container: HTMLElement, protected events: IEvents) {
 		super(container);
 
-		// Инициализация элементов страницы
 		this._counter = ensureElement<HTMLElement>(
 			'.header__basket-counter',
 			container
@@ -27,7 +23,6 @@ export class Page extends Component<IPageData> {
 		this._wrapper = ensureElement<HTMLElement>('.page__wrapper', container);
 		this._basket = ensureElement<HTMLElement>('.header__basket', container);
 
-		// Добавление обработчика события для открытия корзины
 		this._basket.addEventListener('click', () => {
 			this.events.emit('basket:open', container);
 		});

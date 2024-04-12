@@ -11,7 +11,7 @@ export type CardData = IProduct & {
 	button?: string;
 };
 
-// Словарь для маппинга категорий продуктов на CSS классы для стилизации
+// Словарь для маппинга категорий продуктов
 const categoryClasses: Record<string, string> = {
 	другое: '_other',
 	'софт-скил': '_soft',
