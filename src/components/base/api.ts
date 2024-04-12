@@ -1,5 +1,12 @@
+/**
+ * Тип для определения методов запросов API.
+ */
+
 export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
 
+/**
+ * Класс Api предоставляет базовую функциональность.
+ */
 export class Api {
 	readonly baseUrl: string;
 	protected options: RequestInit;
