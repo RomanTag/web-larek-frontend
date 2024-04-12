@@ -1,13 +1,9 @@
 export const API_URL = `${process.env.API_ORIGIN}/api/weblarek`;
 export const CDN_URL = `${process.env.API_ORIGIN}/content/weblarek`;
 
-export const catalogValue = ' синапсов';
+export const CATALOG_VALUE = ' синапсов';
 
-export type ProductCategory =
-	| 'софт-скил'
-	| 'хард-скил'
-	| 'кнопка'
-	| 'дополнительное'
-	| 'другое';
+export const numberWithSpaces = (value: number) =>
+	value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
 export const settings = {};

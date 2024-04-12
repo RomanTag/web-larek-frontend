@@ -1,29 +1,35 @@
 import { ensureElement } from '../utils/utils';
 import { Component } from './base/Component';
-import { IEvents } from './base/events';
-import { IPage } from '../types';
+import { IEvents } from './base/Events';
+import { IPageData } from '../types';
 
 /**
  * Класс Page отвечает за управление основными элементами на странице.
  */
-export class Page extends Component<IPage> {
+export class Page extends Component<IPageData> {
 	protected _counter: HTMLElement;
 	protected _catalog: HTMLElement;
 	protected _wrapper: HTMLElement;
 	protected _basket: HTMLElement;
 
+	/**
+	 * Создает экземпляр класса Page.
+	 */
 	constructor(container: HTMLElement, protected events: IEvents) {
 		super(container);
 
 		// Инициализация элементов страницы
-		this._counter = ensureElement<HTMLElement>('.header__basket-counter');
-		this._catalog = ensureElement<HTMLElement>('.gallery');
-		this._wrapper = ensureElement<HTMLElement>('.page__wrapper');
-		this._basket = ensureElement<HTMLElement>('.header__basket');
+		this._counter = ensureElement<HTMLElement>(
+			'.header__basket-counter',
+			container
+		);
+		this._catalog = ensureElement<HTMLElement>('.gallery', container);
+		this._wrapper = ensureElement<HTMLElement>('.page__wrapper', container);
+		this._basket = ensureElement<HTMLElement>('.header__basket', container);
 
-		// Обработка клика по корзине для отображения содержимого
+		// Добавление обработчика события для открытия корзины
 		this._basket.addEventListener('click', () => {
-			this.events.emit('basket:render');
+			this.events.emit('basket:open', container);
 		});
 	}
 

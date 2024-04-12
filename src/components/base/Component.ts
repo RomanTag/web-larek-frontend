@@ -1,39 +1,52 @@
+/**
+ * Абстрактный базовый класс для компонентов пользовательского интерфейса.
+ */
 export abstract class Component<T> {
-	// Конструктор компонента.
 	protected constructor(protected readonly container: HTMLElement) {}
 
-	// Переключает класс для элемента.
+	/**
+	 * Переключает наличие класса у элемента.
+	 */
 	toggleClass(element: HTMLElement, className: string, force?: boolean) {
 		element.classList.toggle(className, force);
 	}
 
-	// Устанавливает текстовое содержимое элемента.
+	/**
+	 * Устанавливает текстовое содержимое элемента.
+	 */
 	protected setText(element: HTMLElement, value: unknown) {
 		if (element) {
 			element.textContent = String(value);
 		}
 	}
 
-	// Изменяет доступность элемента (disabled/enabled).
+	/**
+	 * Устанавливает или снимает атрибут 'disabled' у элемента.
+	 */
 	setDisabled(element: HTMLElement, state: boolean) {
-		// Проверяем, является ли элемент элементом формы, поддерживающим свойство disabled.
-		if ('disabled' in element) {
-			// Приведение типа элемента к HTMLButtonElement для обращения к свойству disabled.
-			(element as HTMLButtonElement).disabled = state;
+		if (element) {
+			if (state) element.setAttribute('disabled', 'disabled');
+			else element.removeAttribute('disabled');
 		}
 	}
 
-	// Устанавливает элементу стиль 'display: none', скрывая его.
+	/**
+	 * Скрывает элемент, устанавливая его стиль display в 'none'.
+	 */
 	protected setHidden(element: HTMLElement) {
 		element.style.display = 'none';
 	}
 
-	// Удаляет у элемента стиль 'display: none', делая его видимым.
+	/**
+	 * Делает элемент видимым, удаляя у него стиль display.
+	 */
 	protected setVisible(element: HTMLElement) {
 		element.style.removeProperty('display');
 	}
 
-	// Устанавливает атрибуты 'src' и 'alt' для элемента изображения.
+	/**
+	 * Устанавливает изображение для элемента <img>.
+	 */
 	protected setImage(element: HTMLImageElement, src: string, alt?: string) {
 		if (element) {
 			element.src = src;
@@ -43,7 +56,9 @@ export abstract class Component<T> {
 		}
 	}
 
-	// Абстрактный метод для рендеринга компонента.
+	/**
+	 * Абстрактный метод для рендеринга компонента.
+	 */
 	render(data?: Partial<T>): HTMLElement {
 		Object.assign(this as object, data ?? {});
 		return this.container;

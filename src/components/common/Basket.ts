@@ -1,77 +1,58 @@
-import { createElement, ensureElement } from '../../utils/utils';
 import { Component } from '../base/Component';
-import { EventEmitter } from '../base/events';
-import { CatalogItem } from '../Card';
+import { createElement, ensureElement } from '../../utils/utils';
+import { EventEmitter } from '../base/Events';
+import { CATALOG_VALUE } from '../../utils/constants';
+import { IBasketData } from '../../types';
 
-interface IBasket {
-	items: HTMLElement[];
-	price: string;
-	selected: CatalogItem[];
-}
-
-export class Basket extends Component<IBasket> {
-	protected _list: HTMLElement;
-	protected _price: HTMLElement;
-	protected _button: HTMLElement;
-
-	selected: CatalogItem[];
-	total: string;
+/**
+ * Класс Basket представляет компонент корзины на странице.
+ */
+export class Basket extends Component<IBasketData> {
+	protected _itemList: HTMLElement;
+	protected _totalPrice: HTMLElement;
+	protected _orderButton: HTMLElement;
 
 	constructor(container: HTMLElement, protected events: EventEmitter) {
 		super(container);
-		// Инициализация элементов корзины
-		this._list = ensureElement<HTMLElement>('.basket__list', this.container);
-		this._price = this.container.querySelector('.basket__price');
-		this._button = this.container.querySelector('.basket__button');
 
-		if (this._button) {
-			this._button.addEventListener('click', () => {
-				events.emit('address:render');
-			});
-		}
-		this.selected = [];
+		this._itemList = ensureElement<HTMLElement>(
+			'.basket__list',
+			this.container
+		);
+		this._totalPrice = ensureElement<HTMLElement>('.basket__price', container);
+		this._orderButton = this.container.querySelector('.basket__button');
 
-		this.total = '';
+		this._orderButton.addEventListener('click', () => {
+			events.emit('order:open');
+		});
+
+		this.items = [];
 	}
 
-	/*
-	 * Определение состояния кнопки корзины
-	 */
-	protected setButtonStatus(price: string) {
-		parseInt(price) === 0
-			? this.setDisabled(this._button, true)
-			: this.setDisabled(this._button, false);
-	}
-
-	/*
-	 * Установка элементов корзины и их отображение
+	/**
+	 * Устанавливает элементы в корзину и активирует или деактивирует кнопку заказа.
 	 */
 	set items(items: HTMLElement[]) {
 		if (items.length) {
-			this._list.replaceChildren(...items);
+			this._itemList.replaceChildren(...items);
+			this.setDisabled(this._orderButton, false);
 		} else {
-			this._list.replaceChildren(
+			this._itemList.replaceChildren(
 				createElement<HTMLParagraphElement>('p', {
 					textContent: 'Корзина пуста',
 				})
 			);
+			this.setDisabled(this._orderButton, true);
 		}
 	}
 
-	/*
-	 * Устновить стоимость товаров в корзине
+	/**
+	 * Устанавливает общую стоимость товаров в корзине.
 	 */
-	set price(price: string) {
-		this.setText(this._price, price);
-		this.setButtonStatus(price);
-		this.total = price;
-	}
-
-	/*
-	 * Получить стоимость товаров в корзине
-	 */
-
-	get price(): string {
-		return this.total;
+	set total(total: number) {
+		this.setText(
+			this._totalPrice,
+			total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + CATALOG_VALUE
+		);
 	}
 }

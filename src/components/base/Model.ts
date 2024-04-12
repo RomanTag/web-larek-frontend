@@ -1,6 +1,8 @@
-import { IEvents } from './events';
+import { IEvents } from './Events';
 
-// проверка на модель
+/**
+ * Проверка объекта на принадлежность к классу Model.
+ */
 export const isModel = <T>(obj: unknown): obj is Model<T> => {
 	return obj instanceof Model;
 };
@@ -11,12 +13,13 @@ export const isModel = <T>(obj: unknown): obj is Model<T> => {
 export abstract class Model<T> {
 	constructor(data: Partial<T>, protected events: IEvents) {
 		Object.assign(this, data);
+		console.log(this);
 	}
 
 	/**
-	 * Метод для генерации событий.
+	 * Метод для генерации событий изменений в модели.
 	 */
-	emitChanges(event: string, payload?: object) {
+	emitChanges(event: string, payload?: object): void {
 		this.events.emit(event, payload ?? {});
 	}
 }

@@ -1,18 +1,16 @@
 import { ensureElement } from '../../utils/utils';
 import { Component } from '../base/Component';
 import { ISuccess, ISuccessActions } from '../../types';
+import { CATALOG_VALUE, numberWithSpaces } from '../../utils/constants';
 
 /**
- * Компонент успешного выполнения операции.
+ * Success представляет компонент успешного выполнения операции.
  */
 export class Success extends Component<ISuccess> {
 	protected _close: HTMLElement;
 	protected _total: HTMLElement;
 
-	/**
-	 * Создает экземпляр компонента Success.
-	 */
-	constructor(container: HTMLElement, actions: ISuccessActions) {
+	constructor(container: HTMLElement, actions: ISuccessActions, value: number) {
 		super(container);
 
 		this._close = ensureElement<HTMLElement>(
@@ -24,17 +22,11 @@ export class Success extends Component<ISuccess> {
 			this.container
 		);
 
-		// Использование стрелочной функции для обработчика события
 		if (actions?.onClick) {
-			this._close.addEventListener('click', () => actions.onClick());
+			this._close.addEventListener('click', actions.onClick);
+			this._total.textContent = `Списано ${numberWithSpaces(
+				value
+			)} ${CATALOG_VALUE}`;
 		}
-	}
-
-	/**
-	 * Устанавливает общую сумму списания.
-	 */
-	set total(value: string) {
-		const resValue = `Списано ${value}`;
-		this.setText(this._total, resValue);
 	}
 }
